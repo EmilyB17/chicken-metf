@@ -73,6 +73,10 @@ mod3 <- aov(Shannon ~ Time, data = filter(sh, Treatment == "Control"))
 summary(mod3) # no difference
 ggboxplot(filter(sh, Treatment == "Control"), x = "Time", y = "Shannon")
 
+## test 3: is there a dose response
+mod4 <- aov(Shannon ~ Treatment, data = filter(sh, Treatment %in% c("T2", "T3", "T4")))
+summary(mod4) # none
+
 ## ---- Simpson ----
 
 # exploratory plots
@@ -108,3 +112,7 @@ ggboxplot(filter(si, !Treatment %in% c("Males", "Control")),
 mod3 <- aov(Simpson ~ Time, data = filter(si, Treatment == "Control"))
 summary(mod3) # no difference
 ggboxplot(filter(si, Treatment == "Control"), x = "Time", y = "Simpson")
+
+## test 3: is there a dose response
+mod4 <- aov(Simpson ~ Treatment, data = filter(si, Treatment %in% c("T2", "T3", "T4")))
+summary(mod4) # none

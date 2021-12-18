@@ -18,7 +18,7 @@ ps <- pscount %>%
 ### ---- test 1: difference between control and T4 ----
 
 # get data
-t1 <- pscount %>% 
+t1 <- ps %>% 
   ps_filter(Treatment %in% c("Control", "T4")) %>% 
   # transform to relative abundance
   tax_transform("compositional", keep_counts = FALSE) %>% 
@@ -27,7 +27,7 @@ t1 <- pscount %>%
 # test beta dispersion
 bd <- t1 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 # plot
-plot(bd$Treatment$model)
+#plot(bd$Treatment$model)
 
 # test
 mod1 <- t1 %>% 
@@ -35,13 +35,15 @@ mod1 <- t1 %>%
     seed = 123,
     variables = c("Treatment"),
     n_perms = 9999
-  )
+  ) # significant
 
 # plot
 mod1 %>% 
-  ord_calc(method = "PCoA") %>% 
+  ord_calc(method = "auto") %>% 
   ord_plot(color = "Treatment") +
-  stat_ellipse(aes(linetype = Treatment, color = Treatment))
+  stat_ellipse(aes(linetype = Treatment, color = Treatment)) +
+  geom_text(aes(x = -0.8, y = -1.2), label = "adonis p value = 0.0026") +
+  ggtitle("T4 versus control")
 
 ## ---- test 2: difference in metformin treatment over time ----
 
@@ -55,7 +57,7 @@ t2 <- ps %>%
 # test beta dispersion
 bd <- t2 %>% dist_bdisp(variables = "Sample.Date") %>% bdisp_get() # not significant
 # plot
-plot(bd$Sample.Date$model)
+#plot(bd$Sample.Date$model)
 
 # test
 mod2 <- t2 %>% 
@@ -69,13 +71,15 @@ mod2 <- t2 %>%
 mod2 %>% 
   ord_calc(method = "PCoA") %>% 
   ord_plot(color = "Time") +
-  stat_ellipse(aes(linetype = Time, color = Time))
+  stat_ellipse(aes(linetype = Time, color = Time)) +
+  geom_text(aes(x = -0.8, y = -1.6), label = "adonis p value = 0.0043") +
+  ggtitle("All treatments versus time")
 
-## ---- test 3: test interaction between treatment & time ----
+## ---- test 3: metformin treatment dose response ----
 
 # get data
-t1 <- pscount %>% 
-  ps_filter(Treatment %in% c("Control", "T4")) %>% 
+t1 <- ps %>% 
+  ps_filter(!Treatment %in% c("Control", "Males")) %>% 
   # transform to relative abundance
   tax_transform("compositional", keep_counts = FALSE) %>% 
   dist_calc("bray")
@@ -83,44 +87,21 @@ t1 <- pscount %>%
 # test beta dispersion
 bd <- t1 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 # plot
-plot(bd$Treatment$model)
+#plot(bd$Treatment$model)
 
 # test
-mod1 <- t1 %>% 
+mod4 <- t1 %>% 
   dist_permanova(
     seed = 123,
-    variables = c("Treatment"),
+    variables = c("Treatment"), # significant
     n_perms = 9999
   )
 
 # plot
-mod1 %>% 
+mod4 %>% 
   ord_calc(method = "PCoA") %>% 
   ord_plot(color = "Treatment") +
-  stat_ellipse(aes(linetype = Treatment, color = Treatment))
+  stat_ellipse(aes(linetype = Treatment, color = Treatment)) +
+  geom_text(aes(x = -0.8, y = -1.4), label = "adonis p value = 2e-4") +
+  ggtitle("Dose response")
 
-## ---- test 2: difference in metformin treatment over time ----
-
-# get data
-t3 <- ps %>% 
-  # transform to relative abundance
-  tax_transform("compositional", keep_counts = FALSE) %>% 
-  dist_calc("bray")
-
-# test beta dispersion
-bd <- t3 %>% dist_bdisp(variables = c("Treatment", "Time")) %>% bdisp_get() # not significant
-# plot
-plot(bd$Treatment$model)
-
-# test
-mod3 <- t3 %>% 
-  dist_permanova(
-    seed = 123,
-    variables = "Time + Treatment + Time*Treatment", # interaction is significant
-    n_perms = 9999
-  )
-
-# plot
-mod3 %>% 
-  ord_calc(method = "PCoA") %>% 
-  ord_plot(color = "Treatment", shape = "Time") 

@@ -1,0 +1,82 @@
+---
+title: 'Chicken Metformin: Preliminary Report'
+author: "Emily Van Syoc"
+date: "12/15/2021"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      fig.align = "center",
+                      fig.width = 9,
+                      fig.height = 7)
+knitr::opts_knit$set(root.dir = "/Users/epb5360/OneDrive - The Pennsylvania State University/Shared-Trello-Projects/Chicken Metformin/chicken-metf/")
+
+## read chunks for Wu
+knitr::read_chunk("/Users/epb5360/OneDrive - The Pennsylvania State University/Shared-Trello-Projects/Chicken Metformin/chicken-metf/preliminary-report-1-2022.R")
+
+```
+
+## Preliminary Data Report for chicken metformin project
+
+## Data overview
+
+```{r getData}
+
+```
+
+After filtering and removing contaminants, there are 267 bacterial genera in 14 unique phyla.
+
+```{r relAbun}
+
+```
+
+## Statistical models
+
+After consulting with Justin Silverman, I made 2 comparisons:  
+1. Compare control and Treatment 4 -- *is there a difference caused by metformin*  
+2. Compare times -- *is there a difference between times*  
+3. Compare metformin treatments at all times -- *is there a dose response*  
+
+## Alpha Diversity
+
+Alpha diversity is called "richness" and generally compares the number of taxa between groups. Due to the compositional nature of microbiome data, we use different indices to compare alpha diversity.
+
+I calculated Observed taxa (only for exploratory analysis, not statistical comparisons), Shannon's H index, and Simpson's diversity.
+
+In Shannon's diversity, there is only a difference between times 2 and 3. There is no difference in Simpson's diversity.
+
+```{r AlphaDiversity}
+
+```
+
+## Beta Diversity
+
+Beta diversity is the microbial community composition or structure. It refers to the presence/absence of different taxa as well as their relative abundances between groups. 
+
+Beta diversity is compared by transforming the OTU table into a distance matrix using a specific statistic (in this case, we use Bray-Curtis distance). Then, we conduct a permutational ANOVA on the distance matrix to compare groups (called an "adonis" test). These ANOVAs are visualized in an ordination plot.
+
+Beta diversity is commonly more responsive than alpha diversity. We see strong differences in all comparisons. 
+
+```{r BetaDiversity}
+
+```
+
+## Differential relative abundance
+
+Differential relative abundance is calculated with a modified version of log2 fold change with a package called DESeq. These comparisons were made at the Genus level.
+
+
+There are significantly different (Benjamani-Hochberg corrected) genera in each comparison. However, the "Control over Time" comparison shows that there is also natural variation in the microbiome over time. 
+
+Notably, some taxa differ by over a 20 log2 fold change, which is very strong.
+
+```{r RelativeAbundance}
+
+
+```
+
