@@ -5,3 +5,4 @@
 
 # don't track large RData files
 data/*.RData
+preliminary-report-1-2022.html
