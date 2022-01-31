@@ -51,8 +51,8 @@ qqline(resid(testm))
 shapiro.test(resid(testm)) # everything looks good for linear tests
 
 ## test 1: is there a difference between control and T4 (control and metformin)?
-mod1 <- t.test(Shannon ~ Treatment, data = filter(sh, Treatment %in% c("Control", "T4") & Time == 3))
-ggboxplot(filter(sh, Treatment %in% c("Control", "T4") & Time == 3),
+mod1 <- t.test(Shannon ~ Treatment, data = filter(sh, Treatment %in% c("Control", "T4")))
+ggboxplot(filter(sh, Treatment %in% c("Control", "T4")),
           x = "Treatment", y = "Shannon") +
   stat_compare_means(method = 't.test')
 # no difference
@@ -94,8 +94,8 @@ qqline(resid(testm))
 shapiro.test(resid(testm)) # a little iffy
 
 ## test 1: is there a difference between control and T4 (control and metformin)?
-mod1 <- t.test(Simpson ~ Treatment, data = filter(si, Treatment %in% c("Control", "T4") & Time == 3))
-ggboxplot(filter(si, Treatment %in% c("Control", "T4") & Time == 3),
+mod1 <- t.test(Simpson ~ Treatment, data = filter(si, Treatment %in% c("Control", "T4")))
+ggboxplot(filter(si, Treatment %in% c("Control", "T4")),
           x = "Treatment", y = "Simpson") +
   stat_compare_means(method = 't.test')
 # no difference

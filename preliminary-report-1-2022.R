@@ -22,6 +22,10 @@ ps <- pscount %>%
   ps_mutate(Time = fct_recode(Sample.Date, "1" = "8/8/19", "2" = "10/16/19", "3" = "12/20/19")) %>% 
   tax_fix()
 
+## summary
+sample_data(ps) %>% as.data.frame() %>% 
+  group_by(Treatment, Sample.Date) %>% summarize(n())
+
 ### ---- `relAbun` ----
 
 # number of taxa
@@ -66,7 +70,7 @@ alpha <- estimate_richness(ps, measures = c("Shannon", "Simpson", "Observed")) %
 ggboxplot(filter(alpha, !Treatment %in% c("Males", "Control")),
           x = "Time", y = "Shannon",
           add = "dotplot", add.params = list(color = "Treatment"),
-          title = "Shannon's Diversity of all treatments compared to time") +
+          title = "Shannon's Diversity of all treatments (T2, T3, T4) compared to time") +
   stat_compare_means(method = "anova", label.y = 4.8)
 
 ## ---- BetaDiversity ----
@@ -99,7 +103,7 @@ mod1 %>%
   ord_plot(color = "Treatment") +
   stat_ellipse(aes(linetype = Treatment, color = Treatment)) +
   geom_text(aes(x = -0.8, y = -1.2), label = "adonis p value = 0.0026") +
-  ggtitle("T4 versus control")
+  ggtitle("T4 versus control (all times)")
 
 ##  test 2: difference in metformin treatment over time 
 
@@ -129,7 +133,7 @@ mod2 %>%
   ord_plot(color = "Time") +
   stat_ellipse(aes(linetype = Time, color = Time)) +
   geom_text(aes(x = -0.8, y = -1.6), label = "adonis p value = 0.0043") +
-  ggtitle("All treatments versus time")
+  ggtitle("All treatments (T2, T3, T4 combined) versus time")
 
 ## test 3: metformin treatment dose response 
 
@@ -159,7 +163,7 @@ mod4 %>%
   ord_plot(color = "Treatment") +
   stat_ellipse(aes(linetype = Treatment, color = Treatment)) +
   geom_text(aes(x = -0.8, y = -1.4), label = "adonis p value = 2e-4") +
-  ggtitle("Dose response")
+  ggtitle("Dose response (all times combined)")
 
 ## ---- RelativeAbundance ----
 
@@ -196,7 +200,7 @@ x = sort(x, TRUE)
 sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=4) + 
   theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5)) +
-  ggtitle("Metformin T4 versus Control")
+  ggtitle("Metformin T4 versus Control (all times combined)")
 
 ## test2: difference between metformin over time 
 
@@ -231,7 +235,7 @@ x = sort(x, TRUE)
 sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=4) + 
   theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5)) +
-  ggtitle("Metformin treatments T3 versus T1")
+  ggtitle("Time 3 versus Time 1 (T2, T3, T4 combined)")
 
 ### sanity check: control over time 
 
@@ -265,14 +269,14 @@ x = sort(x, TRUE)
 sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=4) + 
   theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5)) +
-  ggtitle("Control over time")
+  ggtitle("Control time 3 versus time 1")
 
 ## test 3: dose response 
 
 # get data
 t1 <- ps %>% 
   ps_filter(!Treatment %in% c("Control", "Males")) %>% 
-  ps_filter(!Treatment %in% c("T2")) %>% 
+  ps_filter(!Treatment %in% c("T3")) %>% 
   tax_fix()
 
 # phyloseq-DEseq
@@ -299,4 +303,4 @@ x = sort(x, TRUE)
 sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + geom_point(size=4) + 
   theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5)) +
-  ggtitle("Dose Response T4 versus T2")
+  ggtitle("Dose Response T4 versus T2 (all times combined)")

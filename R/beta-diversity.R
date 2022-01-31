@@ -27,7 +27,7 @@ t1 <- ps %>%
 # test beta dispersion
 bd <- t1 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 # plot
-#plot(bd$Treatment$model)
+plot(bd$Treatment$model)
 
 # test
 mod1 <- t1 %>% 
@@ -42,8 +42,8 @@ mod1 %>%
   ord_calc(method = "auto") %>% 
   ord_plot(color = "Treatment") +
   stat_ellipse(aes(linetype = Treatment, color = Treatment)) +
-  geom_text(aes(x = -0.8, y = -1.2), label = "adonis p value = 0.0026") +
-  ggtitle("T4 versus control")
+  geom_text(aes(x = -0.8, y = -1.4), label = "adonis p value = 0.0026") +
+  ggtitle("75 mg/kg metformin versus control")
 
 ## ---- test 2: difference in metformin treatment over time ----
 
@@ -67,13 +67,21 @@ mod2 <- t2 %>%
     n_perms = 9999
   )
 
+# perform adonis in vegan to get pairwise
+dis <- phyloseq::distance(t1$ps, method = "bray")
+sampdf <- data.frame(sample_data(t2))
+mod <- adonis(dis ~ Time, data = sampdf)
+pairwise.adonis2(dis ~ Time, data = sampdf)
+
+
 # plot
 mod2 %>% 
   ord_calc(method = "PCoA") %>% 
   ord_plot(color = "Time") +
   stat_ellipse(aes(linetype = Time, color = Time)) +
   geom_text(aes(x = -0.8, y = -1.6), label = "adonis p value = 0.0043") +
-  ggtitle("All treatments versus time")
+  ggtitle("All metformin treatments versus time")
+
 
 ## ---- test 3: metformin treatment dose response ----
 
@@ -87,7 +95,7 @@ t1 <- ps %>%
 # test beta dispersion
 bd <- t1 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 # plot
-#plot(bd$Treatment$model)
+plot(bd$Treatment$model)
 
 # test
 mod4 <- t1 %>% 
@@ -96,6 +104,12 @@ mod4 <- t1 %>%
     variables = c("Treatment"), # significant
     n_perms = 9999
   )
+
+# perform adonis in vegan to get pairwise
+dis <- phyloseq::distance(t1$ps, method = "bray")
+sampdf <- data.frame(sample_data(t1$ps))
+mod <- adonis(dis ~ Treatment, data = sampdf)
+pairwise.adonis2(dis ~ Treatment, data = sampdf) # T3 v T4, T2 v T4, not T2 v T3
 
 # plot
 mod4 %>% 
