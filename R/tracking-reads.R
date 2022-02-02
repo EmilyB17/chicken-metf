@@ -10,13 +10,13 @@ require(ggpubr)
 
 # get data
 # all Seqkit stat output
-tf <- read.table("dada2-data/trimstatf.txt", sep = "\t", header = TRUE) %>% mutate(direction = "forward")
-tr <- read.table("dada2-data/trimstatr.txt", sep = "\t", header = TRUE) %>% mutate(direction = "reverse")
-raw <- read.table("dada2-data/rawstat.txt", sep = "\t", header = TRUE) %>% mutate(step = "raw")
-ad <- read.table("dada2-data/adapter-remstat.txt", sep = "\t", header = TRUE) %>% mutate(step = "adapt")
+tf <- read.table("data/reads-tracking/trimstatf.txt", sep = "\t", header = TRUE) %>% mutate(step = "trim")
+#tr <- read.table("dada2-data/trimstatr.txt", sep = "\t", header = TRUE) %>% mutate(direction = "reverse")
+raw <- read.table("data/reads-tracking/rawstat.txt", sep = "\t", header = TRUE) %>% mutate(step = "raw")
+ad <- read.table("data/reads-tracking/adapter-remstat.txt", sep = "\t", header = TRUE) %>% mutate(step = "adapt")
 
 # dada output
-trk <- read.table("dada2-data/metformintrack-reads-dada.txt", sep = "\t", header = TRUE)
+trk <- read.table("data/reads-tracking/metformintrack-reads-dada.txt", sep = "\t", header = TRUE)
 
 ## ---- wrangle ----
 
@@ -24,45 +24,45 @@ trk <- read.table("dada2-data/metformintrack-reads-dada.txt", sep = "\t", header
 
 # raw files
 rawf <- raw %>% 
-  # add direction
-  mutate(direction = if_else(str_detect(file, "_1.fq.gz"), "forward", "reverse")) %>% 
+  #mutate(direction = if_else(str_detect(file, "_1.fq.gz"), "forward", "reverse")) %>% 
+  # remove reverse reads 
+  filter(str_detect(file, "_1.fq.gz")) %>% 
   mutate(ID = str_extract(file, "M(\\d){1,3}")) %>% 
-  select(num_seqs, ID, direction, step)
+  select(num_seqs, ID, step)
 
 # adapter removed files
 adf <- ad %>% 
   # remove accidental extra "CM" files
   filter(!str_detect(file, "CM")) %>% 
-  mutate(direction = if_else(str_detect(file, "trimmed_1.fastq"), "forward", "reverse")) %>% 
+  #mutate(direction = if_else(str_detect(file, "trimmed_1.fastq"), "forward", "reverse")) %>% 
+  # remove reverse files
+  filter(str_detect(file, "trimmed_1.fastq")) %>% 
   mutate(ID = str_extract(file, "M(\\d){1,3}")) %>% 
-  select(num_seqs, ID, direction, step)
+  select(num_seqs, ID, step)
+
+# trimmed files
+tff <- tf %>% 
+  # get ids
+  mutate(ID = str_extract(file, "M(\\d){1,3}")) %>% 
+  select(num_seqs, ID, step)
 
 # combine all seqkits
-both <- rbind(tr, tf) %>% 
-  mutate(ID = str_extract(file, "M(\\d){1,3}"),
-         step = "trim") %>% 
-  select(num_seqs, ID, direction, step) %>% 
-  rbind(rawf, adf) 
+both <- rbind(rawf, adf, tff)
 
 
 # make track-reads vertical
 trkv <- trk  %>% 
   rownames_to_column(var = "ID") %>% 
-  pivot_longer(cols = !ID, names_to = "step", values_to = "num_seqs") %>% 
-  # add direction
-  mutate(direction = case_when(
-    step %in% "denoisedF" ~ "forward",
-    step %in% "denoisedR" ~ "reverse",
-    step %in% "merged" ~ "NA",
-    step %in% "nonchim" ~ "NA"
-  ))
+  # remove reverse reads
+  select(-denoisedR) %>% 
+  pivot_longer(cols = !ID, names_to = "step", values_to = "num_seqs") 
 
 # merge
 all <- trkv %>% rbind(both) %>% 
   # order
   mutate(step = factor(step, ordered = TRUE, 
                         levels = c("raw", "adapt", "trim",
-                                   "denoisedF", "denoisedR", "merged", "nonchim")))
+                                   "denoisedF", "merged", "nonchim")))
 
 ## ---- visualize ----
 
@@ -72,12 +72,17 @@ ggdensity(all, x = "num_seqs", facet.by = "step")
 # get quartiles
 all %>% group_by(step) %>% get_summary_stats(num_seqs, type = "quantile")
 
+# get summary stats
+all %>% group_by(step) %>% get_summary_stats(num_seqs, type = "mean_sd")
+
+# get sum of raw and nonchim reads
+all %>% group_by(step) %>% summarize(sum = sum(num_seqs))
+
 ## ---- total lost from raw reads ----
 
 # wrangle
 tot <- all %>% 
-  filter(step == c("raw", "nonchim")) %>% 
-  filter(!direction == "reverse") %>% select(-direction) %>% 
+  filter(step %in% c("raw", "nonchim")) %>% 
   pivot_wider(names_from = "step", values_from = "num_seqs") %>% 
   mutate(total.lost = raw - nonchim,
          perc.lost = ((raw-nonchim)/raw) * 100)
