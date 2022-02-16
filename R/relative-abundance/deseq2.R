@@ -39,10 +39,13 @@ t <- psmelt(top)
 # get data
 t1 <- ps %>% 
   ps_filter(Treatment %in% c("Control", "T4")) %>% 
+  # dummy code
+  ps_mutate(tdummy = recode(Treatment, Control = 0, T4 = 1)) %>%
+  tax_glom("Genus") %>% 
   tax_fix()
 
 # phyloseq-DEseq
-dds <- phyloseq_to_deseq2(t1, ~ Treatment)
+dds <- phyloseq_to_deseq2(t1, ~ tdummy)
 
 # perform DESeq
 ds <- DESeq(dds, test = "Wald", fitType = "parametric")

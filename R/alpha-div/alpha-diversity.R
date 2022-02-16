@@ -1,6 +1,7 @@
 ## alpha diversity analysis
 
 # EVS 12/2021
+# 2/2022 model all and account for multiple comparisons
 
 
 require(tidyverse)
@@ -11,7 +12,11 @@ require(ggpubr)
 
 load("./data/ps-decontam-filtered-counts.RData")
 ps <- pscount %>% 
-  ps_mutate(Time = recode(Sample.Date, '8/8/19' = 1, '10/16/19' = 2, '12/20/19' = 3))
+  ps_mutate(Time = case_when(
+    Sample.Date %in% "8/8/19" ~ "40 weeks",
+    Sample.Date %in% "10/16/19" ~ "50 weeks",
+    Sample.Date %in% "12/20/19" ~ "60 weeks"
+  ))
 
 ## ---- get alpha diversity metrics -----
 
