@@ -28,8 +28,8 @@ ggplot(data = psmelt(top), mapping = aes_string(x = "Treatment", y = "Abundance"
   geom_bar(aes(fill = Genus), stat = "identity", position = "fill") +
   labs(x = NULL, y = "Relative Abundance",
        title = "Top 10 most relatively abundant genera") +
-  theme_bw() +
-  facet_grid(~Time)
+  theme_bw() 
+  #facet_grid(~Time)
 
 # what phyla do the most abundant genera belong to?
 t <- psmelt(top)

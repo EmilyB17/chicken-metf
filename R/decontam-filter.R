@@ -25,6 +25,9 @@ ntaxa(ps) # 24,146 taxa
 get_taxa_unique(ps, "Phylum") # 30 different phyla including NA
 get_taxa_unique(ps, "Kingdom") # 4 kingdoms - need to filter this first
 
+# how many controls at each step
+ps %>% samdat_tbl() %>% group_by(Treatment) %>% summarize(n())
+
 # ---- filter for Bacteria & remove NA phyla ----
 
 # get only bacteria

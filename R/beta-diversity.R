@@ -12,8 +12,16 @@ require(ggordiplots)
 
 load("./data/ps-decontam-filtered-counts.RData")
 ps <- pscount %>% 
-  ps_mutate(Time = as.factor(recode(Sample.Date, '8/8/19' = 1, '10/16/19' = 2, '12/20/19' = 3)))
+  ps_mutate(Age = recode_factor(Sample.Date, 
+                                   '8/8/19' = "40 weeks",
+                                   '10/16/19' = "50 weeks",
+                                   '12/20/19' = "60 weeks",
+                                   .ordered = TRUE)) %>% 
+  tax_fix()
 
+### THREE MODELS: BONFERRONI CORRECTION
+# get new critical alpha value
+alpha <- 0.05 / 3
 
 ### ---- test 1: difference between control and T4 ----
 
@@ -21,13 +29,15 @@ ps <- pscount %>%
 t1 <- ps %>% 
   ps_filter(Treatment %in% c("Control", "T4")) %>% 
   # transform to relative abundance
-  tax_transform("compositional", keep_counts = FALSE) %>% 
-  dist_calc("bray")
+  tax_transform("compositional", rank = "Genus", keep_counts = FALSE) %>% 
+  #dist_calc("bray") %>% 
+  dist_calc("aitchison") %>% 
+  # fix 
 
 # test beta dispersion
 bd <- t1 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 # plot
-plot(bd$Treatment$model)
+plot(bd$Treatment$model, main = NULL)
 
 # test
 mod1 <- t1 %>% 
@@ -36,6 +46,11 @@ mod1 <- t1 %>%
     variables = c("Treatment"),
     n_perms = 9999
   ) # significant
+
+## significant after Bonferonni correction?
+mod1$permanova$`Pr(>F)`[1] < alpha # TRUE
+# get modified p value
+p.adjust(mod1$permanova$`Pr(>F)`[1], method = "bonferroni", n = 3)
 
 # plot
 mod1 %>% 
@@ -51,7 +66,7 @@ mod1 %>%
 t2 <- ps %>% 
   ps_filter(!Treatment %in% c("Control", "Males")) %>% 
   # transform to relative abundance
-  tax_transform("compositional", keep_counts = FALSE) %>% 
+  tax_transform("compositional", rank = "Genus", keep_counts = FALSE) %>% 
   dist_calc("bray")
 
 # test beta dispersion
@@ -63,16 +78,19 @@ bd <- t2 %>% dist_bdisp(variables = "Sample.Date") %>% bdisp_get() # not signifi
 mod2 <- t2 %>% 
   dist_permanova(
     seed = 123,
-    variables = c("Time"), # significant
+    variables = c("Age"), # significant
     n_perms = 9999
   )
 
-# perform adonis in vegan to get pairwise
-dis <- phyloseq::distance(t1$ps, method = "bray")
-sampdf <- data.frame(sample_data(t2))
-mod <- adonis(dis ~ Time, data = sampdf)
-pairwise.adonis2(dis ~ Time, data = sampdf)
+## significant after Bonferonni correction?
+mod2$permanova$`Pr(>F)`[1] < alpha # TRUE
+# get modified p value
+p.adjust(mod2$permanova$`Pr(>F)`[1], method = "bonferroni", n = 3)
 
+## pairwise comparisons with pairwise adonis
+dis <- dist_get(t2)
+sampdf <- samdat_tbl(t2)
+pairwise.adonis2(dis ~ Age, data = sampdf) # 50 v 60 and 40 v 60 
 
 # plot
 mod2 %>% 
@@ -86,24 +104,34 @@ mod2 %>%
 ## ---- test 3: metformin treatment dose response ----
 
 # get data
-t1 <- ps %>% 
+t3 <- ps %>% 
   ps_filter(!Treatment %in% c("Control", "Males")) %>% 
   # transform to relative abundance
-  tax_transform("compositional", keep_counts = FALSE) %>% 
+  tax_transform("compositional", rank = "Genus", keep_counts = FALSE) %>% 
   dist_calc("bray")
 
 # test beta dispersion
-bd <- t1 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
+bd <- t3 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 # plot
 plot(bd$Treatment$model)
 
 # test
-mod4 <- t1 %>% 
+mod3 <- t3 %>% 
   dist_permanova(
     seed = 123,
     variables = c("Treatment"), # significant
     n_perms = 9999
   )
+
+## significant after Bonferonni correction?
+mod3$permanova$`Pr(>F)`[1] < alpha # TRUE
+# get modified p value
+p.adjust(mod3$permanova$`Pr(>F)`[1], method = "bonferroni", n = 3)
+
+# get pairwise comparisons
+dis <- dist_get(t3)
+sampdf <- samdat_tbl(t3)
+pairwise.adonis2(dis ~ Treatment, data = sampdf)
 
 # perform adonis in vegan to get pairwise
 dis <- phyloseq::distance(t1$ps, method = "bray")

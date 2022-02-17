@@ -11,10 +11,21 @@ require(ggpubr)
 
 load("./data/ps-decontam-filtered-counts.RData")
 
+## remove Males
+pscount <- pscount %>% ps_filter(!Treatment == "Males")
+
 # get sample data
 sampdf <- sample_data(pscount) %>% 
   data.frame() %>% 
-  rownames_to_column(var = "ID")
+  rownames_to_column(var = "ID") %>% 
+  # add Age
+  mutate(Age = recode_factor(
+    Sample.Date,
+    "8/8/19" = "40 weeks",
+    "10/16/19" = "50 weeks",
+    "12/20/19" = "60 weeks",
+    .ordered = TRUE
+  ))
 
 # get diversity
 alpha <- estimate_richness(pscount) %>% 
@@ -27,9 +38,25 @@ alphav <- alpha %>%
   select(-c(se.chao1, se.ACE)) %>% 
   pivot_longer(cols = c("Observed", "Chao1", "ACE", "Shannon",
                         "Simpson", "InvSimpson", "Fisher"),
-               names_to = "index", values_to = "values")
+               names_to = "index", values_to = "values") %>% 
+  # remove Observed (not good to statistically compare) %>% 
+  filter(!index == "Observed") %>% 
+  # recode Treatment
+  mutate(treat.rec = recode_factor(Treatment,
+                                   Control = "0 mg/kg",
+                                   T2 = "25 mg/kg",
+                                   T3 = "50 mg/kg",
+                                   T4 = "75 mg/kg"))
 
-## ---- first loop: KW tests ----
+## ---- summary stats ----
+
+sum <- alphav %>% group_by(index, treat.rec, Age) %>% 
+  get_summary_stats(values, type = "common") %>% 
+  select(-c(variable, mean, sd, se, ci))
+
+write.table(sum, file = "data/alpha-div-summary-stats.txt", sep = "\t", row.names = FALSE)
+
+## ---- loop through all tests ----
 
 # loop for all 3 models
 inds <- unique(alphav$index)

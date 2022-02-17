@@ -63,6 +63,12 @@ all <- trkv %>% rbind(both) %>%
   mutate(step = factor(step, ordered = TRUE, 
                         levels = c("raw", "adapt", "trim",
                                    "denoisedF", "merged", "nonchim")))
+## summarize for supp info 
+
+s <- all %>% group_by(step) %>% get_summary_stats(type = "common")
+
+# write
+write.table(s, file = "data/read-loss-summary.txt", sep = "\t", row.names = FALSE)
 
 ## ---- visualize ----
 
