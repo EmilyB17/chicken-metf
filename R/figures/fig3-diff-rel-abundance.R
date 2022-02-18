@@ -25,14 +25,15 @@ ps <- pscount %>%
   tax_fix()
 
 # get colors
-cols <- qualitative_hcl("Dark2", n = 2)
+cols <- qualitative_hcl("Dark2", n = 3)
 
 ## ---- lollipop plot ----
 
-# combine mod1 and mod3 (very few significant taxa)
+# combine mod1, mod2, and mod3 (very few significant taxa)
 df<- mod1$taxatree_stats %>% 
   # add identifying column
   mutate(model = "75 mg/kg vs 0 mg/kg") %>% 
+  rbind(mod2$taxatree_stats %>% mutate(model = "60 weeks vs 40 weeks")) %>%  
   rbind(mod3$taxatree_stats %>% mutate(model = "75 mg/kg vs 25 mg/kg")) %>% 
   # get only sig genera
   filter(p.adj.Bon < 0.05) 
@@ -41,6 +42,7 @@ df<- mod1$taxatree_stats %>%
 names <- mod1 %>% ps_get() %>% tax_select(c("Acinetobacter",
                                             "Alloiococcus",
                                             "Cellulosilyticum",
+                                            "Lachnospiraceae UCG-010",
                                             "[Ruminococcus] gnavus group")) %>% 
   ps_melt() %>% 
   select(Phylum, Class, Order, Family, Genus) %>% 
@@ -58,7 +60,7 @@ plot_dat <- df %>% full_join(names, by = c("taxon" = "Genus"))
 p <- ggdotchart(plot_dat, x = "taxa", y = "estimate",
            color = "model", shape = "model",
            sorting = "descending",
-           add = "segments",
+           add = "segments", add.params = list(size = 2),
            dot.size = 5,
            rotate = TRUE,
            xlab = "",

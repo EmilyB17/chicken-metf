@@ -2,8 +2,8 @@
 "40 weeks"	"ACE"	"0 mg/kg"	10	167	366	330.5	46.5
 "50 weeks"	"ACE"	"0 mg/kg"	9	235	347	288	92
 "60 weeks"	"ACE"	"0 mg/kg"	9	214	365	339	105
-"40 weeks"	"ACE"	"25 mg/kg"	11	230	408	317	39.5
-"50 weeks"	"ACE"	"25 mg/kg"	8	245	377	312.5	53
+"40 weeks"	"ACE"	"25 mg/kg"	10	230	408	323	40.75
+"50 weeks"	"ACE"	"25 mg/kg"	9	245	377	311	40
 "60 weeks"	"ACE"	"25 mg/kg"	9	186.152	334	257	54
 "40 weeks"	"ACE"	"50 mg/kg"	10	145	367	311.5	86.75
 "50 weeks"	"ACE"	"50 mg/kg"	10	251	329	281.5	34.5
@@ -14,8 +14,8 @@
 "40 weeks"	"Chao1"	"0 mg/kg"	10	167	366	330.5	46.5
 "50 weeks"	"Chao1"	"0 mg/kg"	9	235	347	288	92
 "60 weeks"	"Chao1"	"0 mg/kg"	9	214	365	339	105
-"40 weeks"	"Chao1"	"25 mg/kg"	11	230	408	317	39.5
-"50 weeks"	"Chao1"	"25 mg/kg"	8	245	377	312.5	53
+"40 weeks"	"Chao1"	"25 mg/kg"	10	230	408	323	40.75
+"50 weeks"	"Chao1"	"25 mg/kg"	9	245	377	311	40
 "60 weeks"	"Chao1"	"25 mg/kg"	9	186	334	257	54
 "40 weeks"	"Chao1"	"50 mg/kg"	10	145	367	311.5	86.75
 "50 weeks"	"Chao1"	"50 mg/kg"	10	251	329	281.5	34.5
@@ -26,8 +26,8 @@
 "40 weeks"	"Fisher"	"0 mg/kg"	10	23.907	52.435	46.893	6.169
 "50 weeks"	"Fisher"	"0 mg/kg"	9	31.683	49.291	40.278	13.298
 "60 weeks"	"Fisher"	"0 mg/kg"	9	27.976	52.266	48.136	14.179
-"40 weeks"	"Fisher"	"25 mg/kg"	11	29.912	58.225	44.886	6.5
-"50 weeks"	"Fisher"	"25 mg/kg"	8	32.214	54.637	43.095	7.993
+"40 weeks"	"Fisher"	"25 mg/kg"	10	29.912	58.225	45.343	6.702
+"50 weeks"	"Fisher"	"25 mg/kg"	9	32.214	54.637	43.008	5.985
 "60 weeks"	"Fisher"	"25 mg/kg"	9	22.804	45.299	35.641	8.183
 "40 weeks"	"Fisher"	"50 mg/kg"	10	19.044	51.095	41.747	14.353
 "50 weeks"	"Fisher"	"50 mg/kg"	10	31.546	44.882	38.452	6.033
@@ -38,8 +38,8 @@
 "40 weeks"	"InvSimpson"	"0 mg/kg"	10	12.138	34.755	22.799	6.279
 "50 weeks"	"InvSimpson"	"0 mg/kg"	9	16.988	37.335	26.823	12.926
 "60 weeks"	"InvSimpson"	"0 mg/kg"	9	15.784	41.125	21.238	11.795
-"40 weeks"	"InvSimpson"	"25 mg/kg"	11	13.857	47.086	24.282	8.731
-"50 weeks"	"InvSimpson"	"25 mg/kg"	8	13.425	34.878	23.278	14.565
+"40 weeks"	"InvSimpson"	"25 mg/kg"	10	13.857	47.086	25.338	10.13
+"50 weeks"	"InvSimpson"	"25 mg/kg"	9	13.425	34.878	23.919	13.25
 "60 weeks"	"InvSimpson"	"25 mg/kg"	9	13.449	31.838	17.156	3.319
 "40 weeks"	"InvSimpson"	"50 mg/kg"	10	7.012	40.013	17.561	3.303
 "50 weeks"	"InvSimpson"	"50 mg/kg"	10	12.152	28.966	22.624	8.608
@@ -50,8 +50,8 @@
 "40 weeks"	"Shannon"	"0 mg/kg"	10	3.689	4.458	4.071	0.337
 "50 weeks"	"Shannon"	"0 mg/kg"	9	3.673	4.381	4.219	0.399
 "60 weeks"	"Shannon"	"0 mg/kg"	9	3.572	4.547	4.127	0.376
-"40 weeks"	"Shannon"	"25 mg/kg"	11	3.528	4.588	4.238	0.274
-"50 weeks"	"Shannon"	"25 mg/kg"	8	3.582	4.488	4.088	0.561
+"40 weeks"	"Shannon"	"25 mg/kg"	10	3.528	4.588	4.265	0.324
+"50 weeks"	"Shannon"	"25 mg/kg"	9	3.582	4.488	4.132	0.539
 "60 weeks"	"Shannon"	"25 mg/kg"	9	3.42	4.279	3.723	0.218
 "40 weeks"	"Shannon"	"50 mg/kg"	10	2.925	4.65	3.851	0.269
 "50 weeks"	"Shannon"	"50 mg/kg"	10	3.405	4.242	4.004	0.304
@@ -62,8 +62,8 @@
 "40 weeks"	"Simpson"	"0 mg/kg"	10	0.918	0.971	0.956	0.011
 "50 weeks"	"Simpson"	"0 mg/kg"	9	0.941	0.973	0.963	0.019
 "60 weeks"	"Simpson"	"0 mg/kg"	9	0.937	0.976	0.953	0.019
-"40 weeks"	"Simpson"	"25 mg/kg"	11	0.928	0.979	0.959	0.014
-"50 weeks"	"Simpson"	"25 mg/kg"	8	0.926	0.971	0.957	0.025
+"40 weeks"	"Simpson"	"25 mg/kg"	10	0.928	0.979	0.96	0.017
+"50 weeks"	"Simpson"	"25 mg/kg"	9	0.926	0.971	0.958	0.02
 "60 weeks"	"Simpson"	"25 mg/kg"	9	0.926	0.969	0.942	0.012
 "40 weeks"	"Simpson"	"50 mg/kg"	10	0.857	0.975	0.943	0.01
 "50 weeks"	"Simpson"	"50 mg/kg"	10	0.918	0.965	0.956	0.017

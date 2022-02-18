@@ -10,8 +10,8 @@ ps <- pscount %>%
   tax_fix()
 
 ## BONFERRONI CORRECTION
-## three tests and 790 total genera in all tests
-alpha <- 0.05 / (790)
+## three tests and 789 total genera in all tests
+alpha <- 0.05 / (789)
 
 ## ---- test1: control v t4 ----
 
@@ -75,7 +75,8 @@ mod1 <- lm_stats
 # get data
 phylo <- ps %>% 
   ps_filter(!Treatment %in% c("Control", "Males")) %>% 
-  ps_filter(Time %in% c("40 weeks", "60 weeks")) %>% 
+  ps_filter(Time %in% c("40 weeks", "60 weeks")) %>%
+  ps_mutate(Age = factor(Time, ordered = TRUE, levels = c("40 weeks", "60 weeks"))) %>% 
   tax_fix()
 
 # model on Genus
@@ -117,7 +118,7 @@ lm_stats$taxatree_stats <- lm_stats$taxatree_stats %>%
            p.adjust(p.value, method = "bonferroni", n = 790))
 
 # are any still significant?
-lm_stats$taxatree_stats %>% filter(p.adj.Bon < 0.05) # none
+View(lm_stats$taxatree_stats %>% filter(p.adj.Bon < 0.05)) # none
 
 # what are the effect sizes?
 hist(lm_stats$taxatree_stats$estimate)
@@ -249,7 +250,7 @@ mod3 <- lm_stats
 
 mod1 # 262
 mod2 # 264
-mod3 #264
+mod3 #263
 
 ## ---- save tables for summary stats ----
 

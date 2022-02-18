@@ -5,7 +5,7 @@ require(tidyverse)
 require(readxl)
 
 # get the key
-key <- read_excel("../selected-Cage bird numbers for microbiome collab.xlsx") %>% 
+key <- read_excel("../Experimental Design and Notes/selected-Cage bird numbers for microbiome collab.xlsx") %>% 
   select(Treatment, Bird)
 
 # get the key for 12/20 samples
@@ -15,7 +15,7 @@ key.dec <- read_excel("../SampleIDs.xlsx", sheet = "temp-12-20-key" ) %>%
   mutate(Bird = as.character(Bird))
 
 # get data
-dat <- read_excel("../SampleIDs.xlsx") %>% 
+dat <- read_excel("../SampleIDs.xlsx", sheet = "DNA_Extractions") %>% 
   # get the columns we want
   select(NovaGeneID, SamplingTubeID, ExtraTubeID, LabID)
 
@@ -125,7 +125,7 @@ ekey <- read_excel("../SampleIDs.xlsx", sheet = "ids-from-Evelyn") %>%
 
 # check
 check <- ekey %>% 
-  anti_join(clean, by = c("Cage" = "Bird")) # 4 don't match, 2 controls and 2 males
+  anti_join(clean, by = c("Cage" = "Bird")) # 2 don't match,  2 males
 
 matches <- ekey %>% 
   inner_join(clean, by = c("Cage" = "Bird"))
