@@ -68,7 +68,20 @@ all <- trkv %>% rbind(both) %>%
 s <- all %>% group_by(step) %>% get_summary_stats(type = "common")
 
 # write
-write.table(s, file = "data/read-loss-summary.txt", sep = "\t", row.names = FALSE)
+#write.table(s, file = "data/read-loss-summary.txt", sep = "\t", row.names = FALSE)
+
+# get negative controls
+negs <- all %>% filter(ID %in% c("M11", "M148", "M94")) %>% 
+  group_by(step) %>% get_summary_stats(type = "common")
+
+# get non-negatives
+non <- all %>% filter(!ID %in% c("M11", "M148", "M94")) %>% 
+  group_by(step) %>% get_summary_stats(type = "common")
+
+# get positive controls
+pos <- all %>% filter(ID %in% c("M10", "M147", "M92", "M93")) %>% 
+  group_by(step) %>% get_summary_stats(type = "common")
+
 
 ## ---- visualize ----
 

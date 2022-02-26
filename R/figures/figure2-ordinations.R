@@ -19,14 +19,16 @@ ps <- pscount %>%
                                       T2 = "25 mg/kg",
                                       T3 = "50 mg/kg",
                                       T4 = "75 mg/kg",
-                                      .ordered = TRUE)) %>% 
+                                      .ordered = TRUE),
+            # recode binary treatment
+            Metformin = if_else(Treatment == "0 mg/kg", "Control", "Metformin")) %>% 
   
   tax_fix()
 
 ## get colors
-treatcols <- qualitative_hcl("Dark3", n = 4)
+treatcols <- qualitative_hcl("Set3", n = 4)
 names(treatcols) <- levels(samdat_tbl(ps)$Treatment)
-agecols <- qualitative_hcl("Dynamic", n = 3)
+agecols <- qualitative_hcl("Dynamic", n = 3, l = 70)
 names(agecols) <- levels(samdat_tbl(ps)$Age)
 
 ## ---- panel A: control v T4 ----
@@ -40,33 +42,44 @@ ps %>%
   ord_calc(method = "PCA") %>% 
   ord_plot(color = "Treatment", shape = "Treatment",
            size = 3,
+           # plot taxa loadings 
            plot_taxa = 1:5,
            tax_lab_style = tax_lab_style(size = 3),
            auto_caption = NA) + 
+  # add ellipses
   stat_ellipse(aes(color = Treatment), alpha = 0.5) +
+  # make plot bigger
   scale_x_continuous(expand = expansion(mult = c(0.2, 0.2))) +
-  scale_color_manual(values = c(treatcols[1], treatcols[4]))
+  # color points
+  scale_color_manual(values = c(treatcols[1], treatcols[4])) +
+  # make text bigger
+  theme(
+    text = element_text(size = 16))
 
 # save
 ggsave(filename = "R/figures/fig2-control-75mg-ordination.png", plot = last_plot(), dpi = 600)
   
 ## ---- panel B: metformin over time ----
 
+
+# 2/26 update: add control samples for comparison
 ps %>% 
-  ps_filter(!Treatment %in% c("0 mg/kg")) %>% 
+  #ps_filter(!Treatment %in% c("0 mg/kg")) %>% 
   # transform to relative abundance
   tax_transform("clr", rank = "Family", keep_counts = FALSE) %>% 
   #dist_calc("bray") %>% 
   # ordinate
   ord_calc(method = "PCA") %>% 
-  ord_plot(color = "Age", shape = "Age",
+  ord_plot(color = "Age", shape = "Metformin",
            size = 3,
            plot_taxa = 1:5,
            tax_lab_style = tax_lab_style(size = 3),
            auto_caption = NA) + 
   stat_ellipse(aes(color = Age), alpha = 0.5) +
   scale_x_continuous(expand = expansion(mult = c(0.2, 0.2))) +
-  scale_color_manual(values = agecols)
+  scale_color_manual(values = agecols) +
+  theme(
+    text = element_text(size = 16))
 
 # save
 ggsave(filename = "R/figures/fig2-age-ordination.png", plot = last_plot(), dpi = 600)
@@ -87,7 +100,9 @@ ps %>%
            auto_caption = NA) + 
   stat_ellipse(aes(color = Treatment), alpha = 0.5) +
   scale_x_continuous(expand = expansion(mult = c(0.2, 0.2))) +
-  scale_color_manual(values = c(treatcols[2], treatcols[3], treatcols[4]))
+  scale_color_manual(values = c(treatcols[2], treatcols[3], treatcols[4])) +
+  theme(
+    text = element_text(size = 16))
 
 # save
 ggsave(filename = "R/figures/fig2-dose-ordination.png", plot = last_plot(), dpi = 600)
@@ -111,9 +126,10 @@ t1 <- ps %>%
 bd <- t1 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 
 # open graphics device
-png(filename = "R/figures/SuppFig1_control-t4_betadisp.png")
+png(filename = "R/figures/SuppFig4_control-t4_betadisp.png")
 # plot
-plot(bd$Treatment$model, main = NULL, sub = NULL)
+plot(bd$Treatment$model, sub = NULL, main = NULL)
+title("A. 0 vs 75 mg/kg metformin", adj = 0)
 dev.off()
 
 ## Panel B: dose response
@@ -124,13 +140,14 @@ t3 <- ps %>%
   ps_filter(!Treatment %in% c("0 mg/kg")) %>% 
   # transform to relative abundance
   tax_transform("compositional", rank = "Genus", keep_counts = FALSE) %>% 
-  dist_calc("bray")
+  dist_calc("aitchison")
 
 # test beta dispersion
 bd <- t3 %>% dist_bdisp(variables = "Treatment") %>% bdisp_get() # significance
 
 # open graphics device
-png(filename = "R/figures/SuppFig1_doseresp_betadisp.png")
+png(filename = "R/figures/SuppFig4_doseresp_betadisp.png")
 # plot
 plot(bd$Treatment$model, main = NULL, sub = NULL)
+title("B. All metformin doses (25, 50, and 75 mg/kg", adj = 0)
 dev.off()

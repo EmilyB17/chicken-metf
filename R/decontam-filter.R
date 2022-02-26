@@ -92,30 +92,124 @@ pssave <- ps_filter(psdecon, SampleBinary == "Sample") %>%
   ps_select(-c(is.neg, SampleBinary))
 
 # write
-save(pssave, file = "./data/ps-decontam-filtered.RData")
+#save(pssave, file = "./data/ps-decontam-filtered.RData")
+
+## ---- negative controls ----
+
+# what do raw controls look like
+neg <- ps %>% ps_filter(Bird == "Sequence-Control") %>% 
+  # get negatives
+  ps_filter(str_detect(Treatment, "NCP")) %>% 
+  tax_fix()
+
+ntaxa(neg)
+
+# barplot
+neg %>%
+  comp_barplot(
+    tax_level = "Phylum", n_taxa = 10,  
+    merge_other = FALSE 
+    # set merge_other = TRUE (the default) to remove outlines from inside "other" category
+  ) +
+  facet_wrap("Treatment", scales = "free") +
+  labs(x = NULL, y = NULL)
+
+## filtered neg controls
+negf <- subset_taxa(ps, taxa_names(ps) %in% taxa_names(psr)) %>% 
+  ps_filter(Bird == "Sequence-Control") %>% 
+  # get negatives
+  ps_filter(str_detect(Treatment, "NCP")) %>% 
+  tax_fix()
+
+ntaxa(negf) # 956
+get_taxa_unique(negf, "Genus")
+
+# barplot
+sample_names(negf) <- c("NC1", "NC2", "NC3")
+
+p <- negf %>%
+  ps_mutate(Name = c("NC1", "NC2", "NC3")) %>% 
+  comp_barplot(
+    tax_level = "Phylum", #n_taxa = 5,
+    #tax_order = "name",
+    label = "Name",
+    sample_order = c("NC1", "NC2", "NC3"),
+    merge_other = TRUE,
+    bar_width = 0.9,
+    # set merge_other = TRUE (the default) to remove outlines from inside "other" category
+  ) +
+  labs(y = "Relative Abundance") +
+  theme(
+      text = element_text(size = 16))
+
+
+# hacky fix to make taxa names alphabetical and remove "other"
+p$data <- filter(p$data, !unique == "other")
+p$data$top %>% head()
+p$data$top <- as.character(p$data$top)
+p$data$top[p$data$top == "other"] <- NA
+p <- p + guides(fill = guide_legend(title = "Phylum", reverse = FALSE))
+p 
+
+p$data$unique <- as.character(p$data$unique)
+p$data$unique[p$data$unique == "other"] <- NA
+p
+
+
+# save
+ggsave(filename = "R/figures/neg-control-barplot.png", plot = p, dpi = 600)
+
+# save
+#save(negf, file = "data/ps-negcontrols-filtered.RData")
+
+
 
 ## ----- positive control -----
 
-## get positive controls only
-pspos <- psdecon %>% ps_filter(Treatment %in% c("PCP2", "PCP3", "PCP1", "PCISO1"))
+# "raw" positive controls
+pos <- ps %>%
+  ps_filter(str_detect(Treatment, "PC")) %>% 
+  tax_fix()
 
-# there are 981 unique taxa
+pos %>% 
+  comp_barplot(
+    tax_level = "Phylum", n_taxa = 8
+  ) +
+  facet_wrap(~Treatment, scales = "free")
+
+## get positive controls only - after removing contaminants
+pspos <- subset_taxa(ps, taxa_names(ps) %in% taxa_names(psdecon)) %>%  
+  ps_filter(Treatment %in% c("PCP2", "PCP3", "PCP1", "PCISO1"))
+
+# there are 516 unique taxa
 ntaxa(pspos)
 
 pspos <- tax_fix(pspos)
 # visualize in relative abundance barplot
 pspos %>%
   comp_barplot(
-    tax_level = "Family", n_taxa = 15,  
-    merge_other = FALSE 
+    tax_level = "Genus", n_taxa = 5,  
+    merge_other = TRUE,
+    label = 'Treatment',
+    bar_width = 0.9
     # set merge_other = TRUE (the default) to remove outlines from inside "other" category
-  ) +
-  facet_wrap("Treatment", scales = "free") +
-  labs(x = NULL, y = NULL) +
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
   )
+
+# barplot
+sample_names(negf) <- c("NC1", "NC2", "NC3")
+negf %>%
+  ps_mutate(Name = c("NC1", "NC2", "NC3")) %>% 
+  comp_barplot(
+    tax_level = "Phylum", n_taxa = 5,
+    label = "Name",
+    sample_order = c("NC1", "NC2", "NC3"),
+    merge_other = TRUE,
+    bar_width = 0.9,
+    # set merge_other = TRUE (the default) to remove outlines from inside "other" category
+  ) 
+
+# save
+ggsave(filename = "R/figures/neg-control-barplot.png", plot = last_plot(), dpi = 600)
 
 ## ---- get phyloseq of counts ----
 
